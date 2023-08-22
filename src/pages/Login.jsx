@@ -42,7 +42,7 @@ const Login = () => {
 
     return (
         <div className="w-screen min-h-screen flex flex-col justify-center gap-8 items-center bg-blue-600">
-            <h1 className="text-white text-8xl font-bold font-mono tracking-tighter">
+            <h1 className="text-white text-8xl font-bold tracking-tighter">
                 bitly
             </h1>
             <div className="bg-white min-w-[600px] p-4 rounded">
