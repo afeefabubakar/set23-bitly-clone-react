@@ -25,3 +25,25 @@ export const getAllLinks = async (token) => {
         },
     });
 };
+
+export const createNewLink = async (token, data) => {
+    return axios.post(
+        `${BASE_URL}/api/createLink`,
+        {
+            link: data,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+};
+
+export const deleteLink = async (token, id) => {
+    return axios.delete(`${BASE_URL}/api/createLink/?id=${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};

@@ -52,7 +52,7 @@ const Header = () => {
                     {cookie.token ? "Logout" : "Login"}
                 </button>
             </div>
-            <div className="w-80"></div>
+            <div className="w-80 flex-shrink-0"></div>
         </>
     );
 };

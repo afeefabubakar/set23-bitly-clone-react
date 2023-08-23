@@ -1,29 +1,53 @@
 import React, { useContext, useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { AuthContext } from "../App";
-import { getAllLinks } from "../utils/api";
+import { deleteLink, getAllLinks } from "../utils/api";
 import editIcon from "../assets/icons/edit.svg";
 import trashIcon from "../assets/icons/trash.svg";
 import copyIcon from "../assets/icons/copy.svg";
+import Modal from "../components/Modal";
+import NewLinkForm from "../components/NewLinkForm";
 
 const Links = () => {
     const { cookie } = useContext(AuthContext);
-    const [fetchLinkState, setFetchLinkState] = useState("pending");
-    const [copyStyle, setCopyStyle] = useState("px-6 py-2 text-lg");
+    const [linkState, setLinkState] = useState("pending");
+    const [editState, setEditState] = useState(false);
+    const [editIndex, setEditIndex] = useState();
     const [links, setLinks] = useState([]);
+    const [showModal, setShowModal] = useState(false);
     const BASE_URL = import.meta.env.VITE_BASE_URL;
+
+    const handleToggleModal = () => setShowModal(!showModal);
 
     const fetchLinks = async () => {
         try {
-            setFetchLinkState("loading");
-            const data = await getAllLinks(cookie.token).then(
+            setLinkState("loading");
+            const resData = await getAllLinks(cookie.token).then(
                 (res) => res.data
             );
-            console.log(data);
-            setLinks(data.links);
-            setFetchLinkState("success");
+
+            setLinks(resData.links);
+            setLinkState("success");
         } catch (error) {
-            setFetchLinkState("error");
+            setLinkState("error");
+        }
+    };
+
+    const handleEditLink = (index) => {
+        setEditIndex(index);
+        setEditState(!editState);
+    };
+
+    useEffect(() => {
+        setEditState(!editState);
+    }, [editIndex]);
+
+    const handleDeleteLink = async (id) => {
+        try {
+            await deleteLink(cookie.token, id).then((res) => res.data);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
         }
     };
 
@@ -33,16 +57,24 @@ const Links = () => {
 
     return (
         <DashboardLayout>
+            <Modal>
+                <NewLinkForm
+                    showModal={showModal}
+                    setShowModal={handleToggleModal}
+                />
+            </Modal>
             <div className="p-8 flex-auto min-h-0">
                 <div className="flex justify-between mb-8">
                     <h4 className="text-orange-100 text-4xl font-bold">
                         Links
                     </h4>
-                    <button className="bg-orange-100 hover:bg-orange-200 transition-all px-6 py-2 text-lg rounded">
+                    <button
+                        onClick={setShowModal}
+                        className="bg-orange-100 hover:bg-orange-200 transition-all px-6 py-2 text-lg rounded">
                         New Link
                     </button>
                 </div>
-                <table className="bg-orange-100 w-full rounded-xl min-h-[600px] h-auto table-auto text-center">
+                <table className="bg-orange-100 w-full rounded-xl table-auto">
                     <thead>
                         <tr>
                             <th>No.</th>
@@ -54,26 +86,50 @@ const Links = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {fetchLinkState === "success" && links.length === 0 && (
+                        {linkState === "success" && links.length === 0 && (
                             <tr>
                                 <td colSpan="6">
                                     <p>There's nothing here</p>
-                                    <button className="text-amber-600 underline">
+                                    <button
+                                        className="text-amber-600 underline"
+                                        onClick={() => setShowModal(true)}>
                                         Create a new link
                                     </button>
                                 </td>
                             </tr>
                         )}
                         {links &&
-                            fetchLinkState === "success" &&
+                            linkState === "success" &&
                             links.map((link, index) => {
                                 return (
                                     <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>
-                                            <a href={link.link} target="_blank">
-                                                {link.link}
-                                            </a>
+                                            {!editState &&
+                                                editIndex !==
+                                                    index(
+                                                        <a
+                                                            href={link.link}
+                                                            target="_blank">
+                                                            {link.link}
+                                                        </a>
+                                                    )}
+                                            {editState &&
+                                                editIndex ===
+                                                    index(
+                                                        <form
+                                                            action=""
+                                                            className="flex flex-row justify-between gap-2">
+                                                            <input
+                                                                className="resize-none bg-orange-100 h-6 w-full outline"
+                                                                type="text"
+                                                                defaultValue={
+                                                                    link.link
+                                                                }
+                                                            />
+                                                            <button>✔️</button>
+                                                        </form>
+                                                    )}
                                         </td>
                                         <td>
                                             <a
@@ -83,7 +139,7 @@ const Links = () => {
                                                 {`${BASE_URL}/${link.slug}`}
                                             </a>
                                             <button
-                                                className={copyStyle}
+                                                className="px-6 py-2 text-lg"
                                                 onClick={(e) => {
                                                     e.target.style.animation =
                                                         "shake 0.5s ease-in-out";
@@ -100,12 +156,28 @@ const Links = () => {
                                             </button>
                                         </td>
                                         <td>{link.visit_counter}</td>
-                                        <td>{link.created_at}</td>
                                         <td>
-                                            <button className="bg-orange-100 hover:text-orange-100 hover:bg-amber-600 px-6 py-2 text-lg rounded transition-all">
+                                            {new Date(
+                                                link.created_at
+                                            ).toLocaleTimeString("en-uk", {
+                                                month: "numeric",
+                                                day: "numeric",
+                                                year: "numeric",
+                                            })}
+                                        </td>
+                                        <td className="text-center">
+                                            <button
+                                                onClick={() =>
+                                                    handleEditLink(index)
+                                                }
+                                                className="bg-orange-100 hover:text-orange-100 hover:bg-amber-600 px-6 py-2 text-lg rounded transition-all">
                                                 <img src={editIcon} alt="" />
                                             </button>
-                                            <button className="bg-orange-100 hover:text-orange-100 hover:bg-amber-600 px-6 py-2 text-lg rounded transition-all">
+                                            <button
+                                                onClick={() =>
+                                                    handleDeleteLink(link.id)
+                                                }
+                                                className="bg-orange-100 hover:text-orange-100 hover:bg-amber-600 px-6 py-2 text-lg rounded transition-all">
                                                 <img src={trashIcon} alt="" />
                                             </button>
                                         </td>
@@ -113,13 +185,13 @@ const Links = () => {
                                 );
                             })}
 
-                        {fetchLinkState === "loading" && (
+                        {linkState === "loading" && (
                             <tr>
                                 <td colSpan="6">Loading...</td>
                             </tr>
                         )}
 
-                        {fetchLinkState === "error" && (
+                        {linkState === "error" && (
                             <tr>
                                 <td colSpan="6">
                                     Error fetching links. Please try again
