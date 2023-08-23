@@ -79,9 +79,10 @@ const Login = () => {
                     )}
 
                     <button
+                        disabled={loginState === "loading"}
                         type="submit"
-                        className="bg-blue-600 p-2 w-full mt-4 text-white font-bold rounded">
-                        Submit
+                        className="bg-blue-600 p-2 w-full mt-4 text-white font-bold rounded disabled:bg-gray-500">
+                        {loginState === "loading" ? "Logging in..." : "Login"}
                     </button>
                     <Link
                         to="/register"

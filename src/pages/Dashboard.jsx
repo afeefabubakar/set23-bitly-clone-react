@@ -23,10 +23,10 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        if (!token) {
-            navigate("/login");
-        } else {
+        if (token) {
             getAuthId();
+        } else {
+            navigate("/login");
         }
     }, [token]);
 
