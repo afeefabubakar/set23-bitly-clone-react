@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
-import { get, set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { getProtected, postLoginUser } from "../utils/api";
+import { postLoginUser } from "../utils/api";
 import { AuthContext } from "../App";
 
 const Login = () => {
     const [loginState, setLoginState] = useState("pending");
-    const { token, setToken, cookie, setTokenCookie } = useContext(AuthContext);
+    const { cookie, setCookie } = useContext(AuthContext);
 
     const navigate = useNavigate();
     const {
@@ -24,21 +24,21 @@ const Login = () => {
                 identifier: data.identifier,
                 password: data.password,
             });
-            setToken(currentUser.jwt);
+            setCookie("token", currentUser.jwt);
             setLoginState("success");
         } catch (error) {
-            setLoginState("error");
             const serverError = error?.response?.data?.message || [];
+            setLoginState("error");
             setError("identifier", { message: serverError });
             setError("password", { message: serverError });
         }
     };
 
     useEffect(() => {
-        if (token) {
+        if (cookie.token) {
             navigate("/dashboard");
         }
-    }, [token]);
+    }, [cookie.token]);
 
     return (
         <div className="w-screen min-h-screen flex flex-col justify-center gap-8 items-center bg-blue-600">

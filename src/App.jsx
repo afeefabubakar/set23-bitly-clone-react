@@ -3,28 +3,14 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-import { createContext, useEffect, useState } from "react";
+import { createContext } from "react";
 import { useCookies } from "react-cookie";
+import Links from "./pages/Links";
 
 export const AuthContext = createContext(null);
 
 function App() {
-    const [token, setToken] = useState("");
     const [cookie, setCookie, removeCookie] = useCookies(["token"]);
-    const setTokenCookie = (token) => {
-        setCookie("token", token);
-    };
-
-    useEffect(() => {
-        if (cookie.token) {
-            setToken(cookie.token);
-        }
-    }, [cookie.token]);
-    useEffect(() => {
-        if (token) {
-            setTokenCookie(token);
-        }
-    }, [token]);
 
     const router = createBrowserRouter([
         {
@@ -43,16 +29,21 @@ function App() {
             path: "/dashboard",
             element: <Dashboard />,
         },
+        {
+            path: "/links",
+            element: <Links />,
+        },
+        {
+            path: "*",
+            element: <h1>404</h1>,
+        },
     ]);
     return (
         <AuthContext.Provider
             value={{
-                token,
-                setToken,
                 cookie,
                 setCookie,
                 removeCookie,
-                setTokenCookie,
             }}>
             <RouterProvider router={router} />
         </AuthContext.Provider>
