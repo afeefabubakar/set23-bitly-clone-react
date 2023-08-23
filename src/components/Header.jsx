@@ -38,7 +38,9 @@ const Header = () => {
                             {NAV.map((link, index) => {
                                 return (
                                     <Link key={index} to={link.path}>
-                                        <li>{link.name}</li>
+                                        <li className="hover:text-amber-600 transition-all">
+                                            {link.name}
+                                        </li>
                                     </Link>
                                 );
                             })}

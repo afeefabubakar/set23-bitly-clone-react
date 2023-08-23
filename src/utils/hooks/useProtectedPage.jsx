@@ -6,14 +6,10 @@ import { AuthContext } from "../../App";
 const useProtectedPage = () => {
     const { cookie, removeCookie } = useContext(AuthContext);
     const navigate = useNavigate();
-    const getAuthId = async () => {
+    const getAuthId = () => {
         try {
-            const data = await getProtected(cookie.token).then(
-                (res) => res.data
-            );
-            console.log(data);
+            getProtected(cookie.token).then;
         } catch (error) {
-            console.log(error);
             removeCookie("token");
         }
     };
