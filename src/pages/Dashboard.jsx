@@ -1,17 +1,8 @@
 import React from "react";
-import useProtectedPage from "../utils/hooks/useProtectedPage";
-import Header from "../components/Header";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 const Dashboard = () => {
-    useProtectedPage();
-
-    return (
-        <div className="w-screen min-h-screen bg-amber-600">
-            <Header />
-            <div className="h-28"></div>
-            <div></div>
-        </div>
-    );
+    return <DashboardLayout>Dashboard</DashboardLayout>;
 };
 
 export default Dashboard;

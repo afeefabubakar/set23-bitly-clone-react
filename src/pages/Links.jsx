@@ -1,10 +1,8 @@
 import React from "react";
-import useProtectedPage from "../utils/hooks/useProtectedPage";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 const Links = () => {
-    useProtectedPage();
-
-    return <div>Links</div>;
+    return <DashboardLayout>Links</DashboardLayout>;
 };
 
 export default Links;
