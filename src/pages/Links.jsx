@@ -8,32 +8,18 @@ import copyIcon from "../assets/icons/copy.svg";
 import Modal from "../components/Modal";
 import NewLinkForm from "../components/NewLinkForm";
 import { useForm } from "react-hook-form";
+import useGetAllLinks from "../utils/hooks/useGetAllLinks";
 
 const Links = () => {
     const { cookie } = useContext(AuthContext);
-    const [linkState, setLinkState] = useState("pending");
     const [editState, setEditState] = useState(false);
     const [editIndex, setEditIndex] = useState();
-    const [links, setLinks] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const { links, linkState, fetchLinks } = useGetAllLinks();
     const { register, handleSubmit } = useForm();
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const handleToggleModal = () => setShowModal(!showModal);
-
-    const fetchLinks = async () => {
-        try {
-            setLinkState("loading");
-            const resData = await getAllLinks(cookie.token).then(
-                (res) => res.data
-            );
-
-            setLinks(resData.links);
-            setLinkState("success");
-        } catch (error) {
-            setLinkState("error");
-        }
-    };
 
     const handleEditLink = async (data, id) => {
         try {
@@ -69,10 +55,6 @@ const Links = () => {
         }
     };
 
-    useEffect(() => {
-        fetchLinks();
-    }, []);
-
     return (
         <DashboardLayout>
             <Modal showModal={showModal}>
@@ -80,9 +62,9 @@ const Links = () => {
             </Modal>
             <div className="p-8 flex-auto min-h-0">
                 <div className="flex justify-between mb-8">
-                    <h4 className="text-orange-100 text-4xl font-bold">
+                    <h2 className="text-orange-100 text-4xl font-bold">
                         Links
-                    </h4>
+                    </h2>
                     <button
                         onClick={setShowModal}
                         className="bg-orange-100 hover:bg-orange-200 transition-all px-6 py-2 text-lg rounded">
@@ -156,7 +138,7 @@ const Links = () => {
                                         </td>
                                         <td>
                                             <a
-                                                onClick={fetchLinks}
+                                                onClick={() => fetchLinks()}
                                                 href={`${BASE_URL}/${link.slug}`}
                                                 target="_blank">
                                                 {`${BASE_URL}/${link.slug}`}

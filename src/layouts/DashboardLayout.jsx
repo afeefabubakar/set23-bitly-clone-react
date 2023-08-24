@@ -6,7 +6,7 @@ const DashboardLayout = ({ children }) => {
     useProtectedPage();
 
     return (
-        <div className="flex min-h-screen bg-amber-600">
+        <div className="flex w-screen min-h-screen bg-amber-600">
             <Header />
             {children}
         </div>

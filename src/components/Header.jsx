@@ -25,7 +25,7 @@ const Header = () => {
 
     return (
         <>
-            <div className="fixed w-80 h-full bg-orange-100 p-8 flex flex-col justify-between">
+            <div className="sticky w-80 h-screen flex-shrink-0 bg-orange-100 p-8 flex flex-col justify-between">
                 <div>
                     <Link to="/" className="w-max">
                         <h1 className="text-4xl font-extrabold text-amber-600 mb-4">
@@ -54,7 +54,7 @@ const Header = () => {
                     {cookie.token ? "Logout" : "Login"}
                 </button>
             </div>
-            <div className="w-80 flex-shrink-0"></div>
+            {/* <div className="w-80 h-full"></div> */}
         </>
     );
 };
