@@ -1,6 +1,23 @@
-import React from "react";
+import React, { useContext } from "react";
+import { useForm } from "react-hook-form";
+import { AuthContext } from "../App";
+import { createNewLink } from "../utils/api";
 
-const NewLinkForm = () => {
+const NewLinkForm = ({ setShowModal }) => {
+    const { handleSubmit, register } = useForm();
+    const { cookie } = useContext(AuthContext);
+
+    // Create a submit link function with axios
+    const submitLink = async (data) => {
+        try {
+            await createNewLink(cookie.token, data.link);
+            setShowModal();
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div
             onClick={setShowModal}

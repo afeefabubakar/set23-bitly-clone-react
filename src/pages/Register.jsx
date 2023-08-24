@@ -19,22 +19,26 @@ const Register = () => {
     const onSubmit = async (data) => {
         try {
             setRegisterState("loading");
-            const newUser = await postRegisterUser({
+            await postRegisterUser({
                 username: data.username,
                 email: data.email,
                 password: data.password,
             });
-            console.log(newUser);
             setRegisterState("success");
         } catch (error) {
+            console.log(error?.response?.data?.error?.errors);
             setRegisterState("error");
-            const serverError = error?.response?.data?.data?.errors || [];
-            console.log(serverError);
+            const serverError = error?.response?.data?.error?.errors || [];
             serverError.map((error) => {
-                setError(error.path, { message: error.message });
+                console.log(error.path, error.msg);
+                setError(error.path, { message: error.msg });
             });
         }
     };
+
+    useEffect(() => {
+        console.log(registerState);
+    }, [registerState]);
 
     useEffect(() => {
         if (token) {
@@ -49,7 +53,7 @@ const Register = () => {
                     bitly
                 </h1>
             </div>
-            <div className="bg-white min-w-[600px] p-4 rounded">
+            <div className="bg-white max-w-[600px] w-11/12 p-4 rounded">
                 {registerState !== "success" && (
                     <>
                         <h2 className="text-2xl mb-4">Register as new user</h2>

@@ -12,7 +12,6 @@ const useProtectedPage = () => {
                 (res) => res.data
             );
         } catch (error) {
-            console.log(error);
             removeCookie("token");
         }
     };

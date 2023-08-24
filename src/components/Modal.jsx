@@ -1,25 +1,22 @@
-import React, { useContext, useState } from "react";
-import { useForm } from "react-hook-form";
-import { createNewLink } from "../utils/api";
-import { AuthContext } from "../App";
-import NewLinkForm from "./NewLinkForm";
+import React from "react";
 
 const Modal = ({ showModal, setShowModal, children }) => {
-    const { handleSubmit, register } = useForm();
-    const { cookie } = useContext(AuthContext);
-
-    // Create a submit link function with axios
-    const submitLink = async (data) => {
-        try {
-            await createNewLink(cookie.token, data.link);
-            setShowModal();
-            window.location.reload();
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    return showModal && { children };
+    return (
+        showModal && (
+            <div
+                onClick={setShowModal}
+                className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-white rounded-xl p-8 max-w-[600px] w-1/2 relative">
+                    <div className="text-3xl absolute right-6 top-4">
+                        <button onClick={setShowModal}>×</button>
+                    </div>
+                    {children}
+                </div>
+            </div>
+        )
+    );
 };
 
 export default Modal;

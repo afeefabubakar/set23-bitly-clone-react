@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import { AuthContext } from "../App";
-import { deleteLink, getAllLinks } from "../utils/api";
+import { deleteLink, editLink, getAllLinks } from "../utils/api";
 import editIcon from "../assets/icons/edit.svg";
 import trashIcon from "../assets/icons/trash.svg";
 import copyIcon from "../assets/icons/copy.svg";
 import Modal from "../components/Modal";
 import NewLinkForm from "../components/NewLinkForm";
+import { useForm } from "react-hook-form";
 
 const Links = () => {
     const { cookie } = useContext(AuthContext);
@@ -15,6 +16,7 @@ const Links = () => {
     const [editIndex, setEditIndex] = useState();
     const [links, setLinks] = useState([]);
     const [showModal, setShowModal] = useState(false);
+    const { register, handleSubmit } = useForm();
     const BASE_URL = import.meta.env.VITE_BASE_URL;
 
     const handleToggleModal = () => setShowModal(!showModal);
@@ -33,18 +35,34 @@ const Links = () => {
         }
     };
 
-    const handleEditLink = (index) => {
+    const handleEditLink = async (data, id) => {
+        try {
+            await editLink(cookie.token, id, data.link);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleEditLinkToggle = (index) => {
+        if (editIndex === index) {
+            setEditIndex(undefined);
+            return;
+        }
         setEditIndex(index);
-        setEditState(!editState);
     };
 
     useEffect(() => {
-        setEditState(!editState);
+        if (editIndex === undefined) {
+            setEditState(false);
+            return;
+        }
+        setEditState(true);
     }, [editIndex]);
 
     const handleDeleteLink = async (id) => {
         try {
-            await deleteLink(cookie.token, id).then((res) => res.data);
+            await deleteLink(cookie.token, id);
             window.location.reload();
         } catch (error) {
             console.log(error);
@@ -57,11 +75,8 @@ const Links = () => {
 
     return (
         <DashboardLayout>
-            <Modal>
-                <NewLinkForm
-                    showModal={showModal}
-                    setShowModal={handleToggleModal}
-                />
+            <Modal showModal={showModal}>
+                <NewLinkForm setShowModal={handleToggleModal} />
             </Modal>
             <div className="p-8 flex-auto min-h-0">
                 <div className="flex justify-between mb-8">
@@ -85,14 +100,14 @@ const Links = () => {
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="text-center">
                         {linkState === "success" && links.length === 0 && (
                             <tr>
                                 <td colSpan="6">
                                     <p>There's nothing here</p>
                                     <button
                                         className="text-amber-600 underline"
-                                        onClick={() => setShowModal(true)}>
+                                        onClick={() => handleToggleModal()}>
                                         Create a new link
                                     </button>
                                 </td>
@@ -105,31 +120,39 @@ const Links = () => {
                                     <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>
-                                            {!editState &&
-                                                editIndex !==
-                                                    index(
-                                                        <a
-                                                            href={link.link}
-                                                            target="_blank">
-                                                            {link.link}
-                                                        </a>
-                                                    )}
                                             {editState &&
-                                                editIndex ===
-                                                    index(
-                                                        <form
-                                                            action=""
-                                                            className="flex flex-row justify-between gap-2">
-                                                            <input
-                                                                className="resize-none bg-orange-100 h-6 w-full outline"
-                                                                type="text"
-                                                                defaultValue={
-                                                                    link.link
-                                                                }
-                                                            />
-                                                            <button>✔️</button>
-                                                        </form>
-                                                    )}
+                                                editIndex === index && (
+                                                    <form
+                                                        onSubmit={handleSubmit(
+                                                            (data) =>
+                                                                handleEditLink(
+                                                                    data,
+                                                                    link.id
+                                                                )
+                                                        )}
+                                                        className="flex flex-row justify-between gap-2">
+                                                        <input
+                                                            className="resize-none bg-orange-100 h-6 w-full outline"
+                                                            type="text"
+                                                            defaultValue={
+                                                                link.link
+                                                            }
+                                                            {...register(
+                                                                "link"
+                                                            )}
+                                                        />
+                                                        <button>✔️</button>
+                                                    </form>
+                                                )}
+                                            {(!editState ||
+                                                (editState &&
+                                                    editIndex !== index)) && (
+                                                <a
+                                                    href={link.link}
+                                                    target="_blank">
+                                                    {link.link}
+                                                </a>
+                                            )}
                                         </td>
                                         <td>
                                             <a
@@ -168,7 +191,7 @@ const Links = () => {
                                         <td className="text-center">
                                             <button
                                                 onClick={() =>
-                                                    handleEditLink(index)
+                                                    handleEditLinkToggle(index)
                                                 }
                                                 className="bg-orange-100 hover:text-orange-100 hover:bg-amber-600 px-6 py-2 text-lg rounded transition-all">
                                                 <img src={editIcon} alt="" />

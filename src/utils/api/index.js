@@ -3,7 +3,7 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const postRegisterUser = async (data) => {
-    return axios.post(`${BASE_URL}/api/register`, data).then((res) => res.data);
+    return axios.post(`${BASE_URL}/api/register`, data);
 };
 
 export const postLoginUser = async (data) => {
@@ -31,6 +31,20 @@ export const createNewLink = async (token, data) => {
         `${BASE_URL}/api/createLink`,
         {
             link: data,
+        },
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+};
+
+export const editLink = async (token, id, link) => {
+    return axios.put(
+        `${BASE_URL}/api/createLink/?id=${id}`,
+        {
+            link: link,
         },
         {
             headers: {
