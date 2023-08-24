@@ -11,7 +11,6 @@ const useProtectedPage = () => {
             const data = await getProtected(cookie.token).then(
                 (res) => res.data
             );
-            console.log(data);
         } catch (error) {
             console.log(error);
             removeCookie("token");
